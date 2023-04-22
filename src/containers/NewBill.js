@@ -15,14 +15,26 @@ export default class NewBill {
     this.billId = null
     new Logout({ document, localStorage, onNavigate })
   }
+  imgValidation  = (file) =>{
+    if(!(file.type.match('image/jp.*')|| file.type.match('image/png'))){
+      this.document.querySelector(`input[data-testid="file"]`).value="";
+      this.document.querySelector(`input[data-testid="file"]`).classList.remove("valide")
+      this.document.querySelector(`input[data-testid="file"]`).classList.add("erreur")
+
+    }else{
+      this.document.querySelector(`input[data-testid="file"]`).classList.add("valide")
+      this.document.querySelector(`input[data-testid="file"]`).classList.remove("erreur")
+    }
+  }
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    if(!(file.type.match('image/jp.*')|| file.type.match('image/png'))){
+    /*if(!(file.type.match('image/jp.*')|| file.type.match('image/png'))){
       this.document.querySelector(`input[data-testid="file"]`).value="";
-    }
+    }*/
+    this.imgValidation(file);
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)

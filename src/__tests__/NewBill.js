@@ -38,7 +38,7 @@ describe("Given I am connected as an employee", () => {
     })
   })
   //Champs vides
-  describe("when I do not fill fields", () =>{
+  describe("when I am on Bill Page and I do not fill fields", () =>{
     test("Then the click on send button should render newBill page", () => {
       const root = document.createElement("div");
       root.setAttribute("id", "root");
@@ -55,9 +55,37 @@ describe("Given I am connected as an employee", () => {
       formNewBill.addEventListener('submit', handleSubmit)
       fireEvent.submit(formNewBill);
       expect(formNewBill).toBeTruthy();
+
     })
   })
-  //Mauvais format du fichier chargé
+  //Test du chargement du fichier
+  describe("when I am on Bill Page and I choose a bad format of file",() => {
+    test("Then the file should not be uploaded", () =>{
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      document.body.innerHTML = NewBillUI();
+      window.onNavigate(ROUTES_PATH.NewBill);
+  
+      const newBill = new NewBill({
+        document, onNavigate, store: mockStore,localStorage: window.localStorage
+      })
+
+      const handleChangeFile = jest.spyOn(newBill, "handleChangeFile");
+      const input = screen.getByTestId("file");
+      input.addEventListener("change", handleChangeFile);
+      const file = new File(["img"], "nom.jpg", {
+        type: "image/jpg",
+      });
+      const textFile = new File([""], "filename.txt", { type: 'text/html' });
+      fireEvent.change(input, {target : {files:[textFile]}})
+      //user.upload(input, file);
+      expect(handleChangeFile).toHaveBeenCalled();
+      expect(input.classList.contains('erreur')).toBe(true);
+    })
+  })
+  
 
   //Champs remplis au bon format
   describe("When I am on NewBill Page and I do fill fields in correct format", () => {
