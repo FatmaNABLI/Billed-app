@@ -10,6 +10,7 @@ import Bills from "../containers/Bills";
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
+import mockStore from "../__mocks__/store"
 
 import router from "../app/Router.js";
 
@@ -31,8 +32,6 @@ describe("Given I am connected as an employee", () => {
       //to-do write expect expression
       //expect(windowIcon).toHaveClass('active-icon');
       expect(windowIcon.classList.contains('active-icon')).toBe(true);
-      
-
     })
 
     test("then the click on new Bill Button shoud render new Bill Page", async () => {
@@ -93,6 +92,74 @@ describe("Given I am connected as an employee", () => {
     })
 
     // test d'intégration GET
+    describe("When I navigate to Bills page", () => {
+      test("fetches bills from mock API GET", async () => {
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        localStorage.setItem("user", JSON.stringify({ type: "Employee"}));
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+
+        await waitFor(() => screen.getByText("Mes notes de frais"))
+        expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+
+        const tableRows = screen.getByTestId("tbody");
+        expect(tableRows).toBeTruthy();
+        
+        const rows = screen.getAllByRole("row");
+        //Ligne de l'entete et 4 bills => 5 lignes
+        expect(rows).toHaveLength(5);
+      })
+      describe("When an error occurs on API", () => {
+        beforeEach(() => {
+          jest.spyOn(mockStore, "bills")
+          Object.defineProperty(
+              window,
+              'localStorage',
+              { value: localStorageMock }
+          )
+          window.localStorage.setItem('user', JSON.stringify({
+            type: "Employee", email: "a@a" 
+          }))
+          const root = document.createElement("div")
+          root.setAttribute("id", "root")
+          document.body.appendChild(root)
+          router()
+        })
+
+        test("fetches bills from an API and fails with 404 message error", async () => {
+          
+          mockStore.bills.mockImplementationOnce(() => {
+            return {
+              list: () => {
+                return Promise.reject(new Error("Erreur 404"));
+              },
+            };
+          });
+          window.onNavigate(ROUTES_PATH.Bills);
+          await new Promise(process.nextTick);
+          const message = await screen.getByText(/Erreur 404/);
+          expect(message).toBeTruthy();
+        });
+  
     
+        test("fetches messages from an API and fails with 500 message error", async () => {
+          mockStore.bills.mockImplementationOnce(() => {
+            return {
+              list : () =>  {
+                return Promise.reject(new Error("Erreur 500"))
+              }
+            }})
+          window.onNavigate(ROUTES_PATH.Bills)
+          await new Promise(process.nextTick);
+          const message = await screen.getByText(/Erreur 500/)
+          expect(message).toBeTruthy()
+        })
+      })
+    
+    
+    })
   })
 })
