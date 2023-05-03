@@ -51,14 +51,14 @@ describe("Given I am connected as an employee", () => {
         document, onNavigate, store: mockStore,localStorage: window.localStorage
       })
       const formNewBill = screen.getByTestId('form-new-bill')
-      const handleSubmit = jest.fn(newBill. handleSubmit);      
+      const handleSubmit = jest.fn(newBill.handleSubmit);      
       formNewBill.addEventListener('submit', handleSubmit)
       fireEvent.submit(formNewBill);
       expect(formNewBill).toBeTruthy();
 
     })
   })
-  //Test du chargement du fichier
+  //Test du chargement du fichier au mauvais format
   describe("when I am on Bill Page and I choose a bad format of file",() => {
     test("Then the file should not be uploaded", () =>{
       const root = document.createElement("div");
@@ -75,18 +75,39 @@ describe("Given I am connected as an employee", () => {
       const handleChangeFile = jest.spyOn(newBill, "handleChangeFile");
       const input = screen.getByTestId("file");
       input.addEventListener("change", handleChangeFile);
-      const file = new File(["img"], "nom.jpg", {
-        type: "image/jpg",
-      });
-      const textFile = new File([""], "filename.txt", { type: 'text/html' });
+      const textFile = new File(["text"], "filename.txt", { type: 'text/html' });
       fireEvent.change(input, {target : {files:[textFile]}})
       //user.upload(input, file);
       expect(handleChangeFile).toHaveBeenCalled();
       expect(input.classList.contains('erreur')).toBe(true);
+      expect(inputFile.files[0].name).toBe("sample.jpg");
     })
   })
-  
+ //Test du chargement du fichier au bon format  
+ describe("when I am on Bill Page and I choose a bad format of file",() => {
+  test("Then the file should be uploaded", () =>{
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+    document.body.innerHTML = NewBillUI();
+    window.onNavigate(ROUTES_PATH.NewBill);
 
+    const newBill = new NewBill({
+      document, onNavigate, store: mockStore,localStorage: window.localStorage
+    })
+
+    const handleChangeFile = jest.spyOn(newBill, "handleChangeFile");
+    const input = screen.getByTestId("file");
+    input.addEventListener("change", handleChangeFile);
+    const file = new File(["img"], "nom.jpg", {
+      type: "image/jpg",
+    });
+    fireEvent.change(input, {target : {files:[file]}})
+    expect(handleChangeFile).toHaveBeenCalled();
+    expect(input.classList.contains('erreur')).NotToBe(true);
+  })
+})
   //Champs remplis au bon format
   describe("When I am on NewBill Page and I do fill fields in correct format", () => {
     test("Then the click on send button should render Bills page", () => {
@@ -151,6 +172,6 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  // test d'intégration POST
+  // test d'intégration POST"'  
 
 })
