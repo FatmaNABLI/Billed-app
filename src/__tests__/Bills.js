@@ -65,17 +65,18 @@ describe("Given I am connected as an employee", () => {
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
       }))
-      const bills = new Bills({
+      const billsPage = new Bills({
         document, onNavigate, store: null,localStorage: window.localStorage
       })
 
-      document.body.innerHTML =  Actions()
-      const eye = screen.getByTestId('icon-eye')
-      const handleClickIconEye = jest.fn(bills.handleClickIconEye(eye))
-
       document.body.innerHTML =  BillsUI({ data: bills })
-      eye.addEventListener('click', handleClickIconEye)
-      userEvent.click(eye)
+      const iconEyes = screen.getAllByTestId('icon-eye');
+      const iconEye = iconEyes[0];
+      //const eye = screen.getByTestId('icon-eye')
+      const handleClickIconEye = jest.fn(billsPage.handleClickIconEye(iconEye))
+
+      iconEye.addEventListener('click', handleClickIconEye)
+      userEvent.click(iconEye)
       expect(handleClickIconEye).toHaveBeenCalled()
       const modale = screen.getByTestId("modalFile");
       expect(modale).toBeTruthy()
