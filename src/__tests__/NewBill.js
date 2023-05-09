@@ -60,7 +60,7 @@ describe("Given I am connected as an employee", () => {
   })
   //Test du chargement du fichier au mauvais format
   describe("when I am on Bill Page and I choose a bad format of file",() => {
-    test("Then the file should not be uploaded", () =>{
+    test("Then an error message should be displayed", () =>{
       const root = document.createElement("div");
       root.setAttribute("id", "root");
       document.body.append(root);
@@ -77,14 +77,15 @@ describe("Given I am connected as an employee", () => {
       input.addEventListener("change", handleChangeFile);
       const textFile = new File(["text"], "filename.txt", { type: 'text/html' });
       fireEvent.change(input, {target : {files:[textFile]}})
-      //user.upload(input, file);
       expect(handleChangeFile).toHaveBeenCalled();
-      expect(input.classList.contains('erreur')).toBe(true);
-      expect(inputFile.files[0].name).toBe("sample.jpg");
+      const errorMessage = screen.getByTestId("erreur-file");
+      const styles = getComputedStyle(errorMessage);
+      expect(styles.display).toBe('block');
+      //expect(input.classList.contains('erreur')).toBe(true);
     })
   })
  //Test du chargement du fichier au bon format  
- describe("when I am on Bill Page and I choose a bad format of file",() => {
+ describe("when I am on Bill Page and I choose a good format of file",() => {
   test("Then the file should be uploaded", () =>{
     const root = document.createElement("div");
     root.setAttribute("id", "root");
@@ -105,11 +106,11 @@ describe("Given I am connected as an employee", () => {
     });
     fireEvent.change(input, {target : {files:[file]}})
     expect(handleChangeFile).toHaveBeenCalled();
-    expect(input.classList.contains('erreur')).NotToBe(true);
+    expect(input.files[0].name).toBe("nom.jpg");
   })
 })
   //Champs remplis au bon format
-  describe("When I am on NewBill Page and I do fill fields in correct format", () => {
+ describe("When I am on NewBill Page and I do fill fields in correct format", () => {
     test("Then the click on send button should render Bills page", () => {
       
       const root = document.createElement("div");
@@ -171,7 +172,6 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getByText("Mes notes de frais")).toBeTruthy();
     })
   })
-
   // test d'intégration POST"'  
 
 })

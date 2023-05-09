@@ -18,12 +18,12 @@ export default class NewBill {
   imgValidation  = (file) =>{
     if(!(file.type.match('image/jp.*')|| file.type.match('image/png'))){
       this.document.querySelector(`input[data-testid="file"]`).value="";
-      this.document.querySelector(`input[data-testid="file"]`).classList.remove("valide")
-      this.document.querySelector(`input[data-testid="file"]`).classList.add("erreur")
+      this.document.getElementById("file_error").classList.remove("valide")
+      this.document.getElementById("file_error").classList.add("erreur")
 
     }else{
-      this.document.querySelector(`input[data-testid="file"]`).classList.add("valide")
-      this.document.querySelector(`input[data-testid="file"]`).classList.remove("erreur")
+      this.document.getElementById("file_error").classList.add("valide")
+      this.document.getElementById("file_error").classList.remove("erreur")
     }
   }
   handleChangeFile = e => {
@@ -77,6 +77,7 @@ export default class NewBill {
   }
 
   // not need to cover this function by tests
+  /* istanbul ignore next */
   updateBill = (bill) => {
     if (this.store) {
       this.store

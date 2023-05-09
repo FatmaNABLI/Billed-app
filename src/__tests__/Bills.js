@@ -71,18 +71,22 @@ describe("Given I am connected as an employee", () => {
 
       document.body.innerHTML =  BillsUI({ data: bills })
       const iconEyes = screen.getAllByTestId('icon-eye');
-      const iconEye = iconEyes[0];
-      //const eye = screen.getByTestId('icon-eye')
-      const handleClickIconEye = jest.fn(billsPage.handleClickIconEye(iconEye))
-
-      iconEye.addEventListener('click', handleClickIconEye)
-      userEvent.click(iconEye)
-      expect(handleClickIconEye).toHaveBeenCalled()
+      const handleClickIconEye = jest.fn(billsPage.handleClickIconEye)
       const modale = screen.getByTestId("modalFile");
-      expect(modale).toBeTruthy()
-      const styles = getComputedStyle(modale);
-      expect(styles.display).toBe('block');
+      //const styles = getComputedStyle(modale);
+      //expect(styles.display).toBe('block');
+      $.fn.modal = jest.fn(() => modale.classList.add("show")); //mock de la modale
+
+      iconEyes.forEach(iconEye => {
+        iconEye.addEventListener("click", () => handleClickIconEye(iconEye));
+        userEvent.click(iconEye);
+        expect(handleClickIconEye).toHaveBeenCalled();
+        //expect(modale).toHaveClass("show");
+        expect(modale.classList.contains('show')).toBe(true);
+      });
+
     })
+    
    
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
