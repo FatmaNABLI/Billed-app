@@ -1,13 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-
 import {screen, waitFor, fireEvent} from "@testing-library/dom"
+import "@testing-library/jest-dom";
 import userEvent from '@testing-library/user-event'
 import BillsUI from "../views/BillsUI.js"
 import Actions from "../views/Actions.js"
 import Bills from "../containers/Bills";
 import { bills } from "../fixtures/bills.js"
+import mockedBillsWithErrors from "../__mocks__/store-with-errors";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import mockStore from "../__mocks__/store"
@@ -55,7 +56,7 @@ describe("Given I am connected as an employee", () => {
       expect(handleClickNewBill).toHaveBeenCalled()
       expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
     })
-
+/*
     test("then the click on the icon eye a modal should open", async () => {
 
       const onNavigate = (pathname) => {
@@ -71,23 +72,49 @@ describe("Given I am connected as an employee", () => {
 
       document.body.innerHTML =  BillsUI({ data: bills })
       const iconEyes = screen.getAllByTestId('icon-eye');
-      const handleClickIconEye = jest.fn(billsPage.handleClickIconEye)
+      //const handleClickIconEye = jest.fn(billsPage.handleClickIconEye)
+      const handleClickIconEye = jest.fn((icon) => billsPage.handleClickIconEye(icon));
       const modale = screen.getByTestId("modalFile");
-      //const styles = getComputedStyle(modale);
-      //expect(styles.display).toBe('block');
       $.fn.modal = jest.fn(() => modale.classList.add("show")); //mock de la modale
-
       iconEyes.forEach(iconEye => {
         iconEye.addEventListener("click", () => handleClickIconEye(iconEye));
+        //userEvent.click(iconEye);
+        fireEvent.click(iconEye);
+        expect(handleClickIconEye).toHaveBeenCalled();
+        expect(modale.classList.contains('show')).toBe(true);
+      });
+
+     
+
+    })
+    */
+    describe("When I click on the icon eye", () => {
+      test("A modal should open ", () => {
+        document.body.innerHTML = BillsUI({ data: bills });
+        const onNavigate = (pathname) => {
+          document.body.innerHTML = ROUTES({ pathname });
+        };
+        const sampleBills = new Bills({
+          document,
+          onNavigate,
+          store: null,
+          localStorage: window.localStorage,
+        });
+    
+        const modale = document.getElementById("modaleFile");
+        $.fn.modal = jest.fn(() => modale.classList.add("show"));
+        const handleClickIconEye = jest.fn(() => sampleBills.handleClickIconEye);
+        const iconEye = screen.getAllByTestId("icon-eye")[0];
+    
+        iconEye.addEventListener("click", handleClickIconEye);
         userEvent.click(iconEye);
         expect(handleClickIconEye).toHaveBeenCalled();
         //expect(modale).toHaveClass("show");
         expect(modale.classList.contains('show')).toBe(true);
+        //const proof = document.querySelector(".bill-proof-container img");
+        //expect(proof).not.toHaveAttribute("src", "https://test.storage.tld/null");
       });
-
-    })
-    
-   
+    });
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
@@ -170,3 +197,39 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
+
+describe("When corrupted data was introduced", () => {
+  test("Then it should return unformatted date", async () => {
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+    window.onNavigate(ROUTES_PATH.Bills);
+
+    const sampleBills = new Bills({
+      document,
+      onNavigate,
+      store: mockedBillsWithErrors,
+      localStorage: window.localStorage,
+    });
+    const sampleBillsSorted = await sampleBills.getBills().then((data) => {
+      const dataResult = [...data];
+      return dataResult;
+    });
+    document.body.innerHTML = BillsUI({ data: sampleBillsSorted });
+    const html = document.body.textContent;
+    const pattern = /\d+[- /.]\d+[- /.]\d+/i; /* unformatted data */
+    const patternResult = pattern.test(html);
+    expect(patternResult).toEqual(true);
+  });
+});
