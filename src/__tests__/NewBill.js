@@ -109,9 +109,9 @@ describe("Given I am connected as an employee", () => {
     expect(input.files[0].name).toBe("nom.jpg");
   })
 })
-  //Champs remplis au bon format
- describe("When I am on NewBill Page and I do fill fields in correct format", () => {
-    test("Then the click on send button should render Bills page", () => {
+// test d'intégration POST new bill  
+  describe("When I Submit a vamid bill form", () => {
+    test("then a bill is created", () => {
       
       const root = document.createElement("div");
       root.setAttribute("id", "root");
@@ -172,6 +172,4 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getByText("Mes notes de frais")).toBeTruthy();
     })
   })
-  // test d'intégration POST"'  
-
 })
