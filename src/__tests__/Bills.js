@@ -56,38 +56,7 @@ describe("Given I am connected as an employee", () => {
       expect(handleClickNewBill).toHaveBeenCalled()
       expect(screen.getAllByText('Envoyer une note de frais')).toBeTruthy()
     })
-/*
-    test("then the click on the icon eye a modal should open", async () => {
 
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      const billsPage = new Bills({
-        document, onNavigate, store: null,localStorage: window.localStorage
-      })
-
-      document.body.innerHTML =  BillsUI({ data: bills })
-      const iconEyes = screen.getAllByTestId('icon-eye');
-      //const handleClickIconEye = jest.fn(billsPage.handleClickIconEye)
-      const handleClickIconEye = jest.fn((icon) => billsPage.handleClickIconEye(icon));
-      const modale = screen.getByTestId("modalFile");
-      $.fn.modal = jest.fn(() => modale.classList.add("show")); //mock de la modale
-      iconEyes.forEach(iconEye => {
-        iconEye.addEventListener("click", () => handleClickIconEye(iconEye));
-        //userEvent.click(iconEye);
-        fireEvent.click(iconEye);
-        expect(handleClickIconEye).toHaveBeenCalled();
-        expect(modale.classList.contains('show')).toBe(true);
-      });
-
-     
-
-    })
-    */
     describe("When I click on the icon eye", () => {
       test("A modal should open ", () => {
         document.body.innerHTML = BillsUI({ data: bills });
