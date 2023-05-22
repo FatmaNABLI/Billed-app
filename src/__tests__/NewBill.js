@@ -110,7 +110,7 @@ describe("Given I am connected as an employee", () => {
   })
 })
 // test d'intégration POST new bill  
-  describe("When I Submit a vamid bill form", () => {
+  describe("When I Submit a valid bill form", () => {
     test("then a bill is created", () => {
       
       const root = document.createElement("div");
@@ -170,6 +170,7 @@ describe("Given I am connected as an employee", () => {
       formNewBill.addEventListener('submit', handleSubmit)
       fireEvent.submit(formNewBill);
       expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+      
     })
   })
 })

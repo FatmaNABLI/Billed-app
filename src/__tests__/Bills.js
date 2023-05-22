@@ -74,14 +74,10 @@ describe("Given I am connected as an employee", () => {
         $.fn.modal = jest.fn(() => modale.classList.add("show"));
         const handleClickIconEye = jest.fn(() => sampleBills.handleClickIconEye);
         const iconEye = screen.getAllByTestId("icon-eye")[0];
-    
         iconEye.addEventListener("click", handleClickIconEye);
         userEvent.click(iconEye);
         expect(handleClickIconEye).toHaveBeenCalled();
-        //expect(modale).toHaveClass("show");
         expect(modale.classList.contains('show')).toBe(true);
-        //const proof = document.querySelector(".bill-proof-container img");
-        //expect(proof).not.toHaveAttribute("src", "https://test.storage.tld/null");
       });
     });
     test("Then bills should be ordered from earliest to latest", () => {
@@ -139,8 +135,6 @@ describe("Given I am connected as an employee", () => {
               },
             };
           });
-          //window.onNavigate(ROUTES_PATH.Bills);
-          //await new Promise(process.nextTick);
           const html = BillsUI({ error: 'Erreur 404' });
 				  document.body.innerHTML = html;
           const message = await screen.getByText(/Erreur 404/);
@@ -197,7 +191,7 @@ describe("When corrupted data was introduced", () => {
     });
     document.body.innerHTML = BillsUI({ data: sampleBillsSorted });
     const html = document.body.textContent;
-    const pattern = /\d+[- /.]\d+[- /.]\d+/i; /* unformatted data */
+    const pattern = /\d+[- /]\d+[- /]\d+/i; /* unformatted data */
     const patternResult = pattern.test(html);
     expect(patternResult).toEqual(true);
   });
